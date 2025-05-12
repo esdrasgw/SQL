@@ -254,3 +254,80 @@ SELECT nome, COUNT (id)
 	FROM funcionarios
 	GROUP BY nome
 	HAVING COUNT(id) > 1;
+
+
+
+-- Segunda parte de aulas
+
+CREATE TABLE aluno (
+	id SERIAL PRIMARY KEY,
+	primeiro_nome VARCHAR(255) NOT NULL,
+	ultimo_nome VARCHAR(255) NOT NULL,
+	data_nascimento DATE NOT NULL
+);
+
+CREATE TABLE categoria (
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE curso (
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(255) NOT NULL,
+	categoria_id INTEGER NOT NULL REFERENCES categoria(id)
+);
+
+CREATE TABLE aluno_curso (
+	aluno_id INTEGER NOT NULL REFERENCES aluno(id),
+	curso_id INTEGER NOT NULL REFERENCES curso(id),
+	PRIMARY KEY (aluno_id, curso_id)
+);
+
+INSERT INTO aluno (primeiro_nome, ultimo_nome, data_nascimento) VALUES (
+	'Teste', 'Testando', '1996-10-21'), (
+	'Testado', 'Testand', '2000-05-12'), (
+	'Test', 'Testtta', '2005-12-09'), (
+	'Tsete', 'Odnatset', '1976-03-15');
+
+INSERT INTO categoria(nome) VALUES ('Front-end'), ('Programação'), ('Bancos de Dados'), ('Data Science');
+
+INSERT INTO curso(nome, categoria_id) VALUES 
+	('HTML', 1),
+	('CSS', 1),
+	('JS', 1),
+	('PHP', 2),
+	('Java', 2),
+	('C++', 2),
+	('PostgreSQL', 3),
+	('MySQL', 3),
+	('Oracle', 3),
+	('SQLite', 3),
+	('Pandas', 4),
+	('Machine Learning', 4),
+	('Power BI', 4);
+
+INSERT INTO aluno_curso VALUES (1,4), (1, 11), (2,1), (2,2), (3,4), (3,3), (4,4), (4,6), (4,5);
+
+-- PRATICA
+
+SELECT aluno.primeiro_nome, aluno.ultimo_nome, COUNT(aluno_curso.curso_id) numero_cursos
+	FROM aluno
+	JOIN aluno_curso ON aluno_curso.aluno_id = aluno.id
+--	JOIN curso ON curso.id = aluno_curso.curso_id
+	GROUP BY 1, 2
+	ORDER BY numero_cursos DESC
+	LIMIT 1;
+
+SELECT curso.nome, COUNT(aluno_curso.aluno_id) numero_alunos
+	FROM curso
+	JOIN aluno_curso ON aluno_curso.curso_id = curso.id
+	GROUP BY 1
+	ORDER BY numero_alunos DESC
+	LIMIT 1;
+
+SELECT categoria.nome, COUNT(aluno_curso.aluno_id) numero_alunos
+	FROM categoria
+	JOIN aluno_curso ON aluno_curso.curso_id = categoria.id
+	GROUP BY 1
+	ORDER BY numero_alunos DESC
+	LIMIT 1;
