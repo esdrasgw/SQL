@@ -1,0 +1,256 @@
+-- table inicial para o teste dos tipos de variável
+
+CREATE TABLE aluno (
+	id SERIAL,
+	nome VARCHAR(255),
+	cpf CHAR(11),
+	observacao TEXT,
+	idade INTEGER,
+	dinheiro NUMERIC(10,2),
+	altura REAL,
+	ativo BOOLEAN,
+	data_nascimento DATE,
+	hora_aula TIME,
+	matricula_em TIMESTAMP
+);
+
+-- modelo de insert
+
+INSERT INTO aluno (
+nome, 
+cpf, 
+observacao, 
+idade, 
+dinheiro, 
+altura, 
+ativo, 
+data_nascimento, 
+hora_aula,
+matricula_em) VALUES (
+'TESTE2',
+'01234567891',
+'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ac aliquam purus. Cras vitae neque ipsum. Donec sapien arcu, sodales eu sapien eu, porta dictum turpis. Nulla eu lorem id mi tincidunt venenatis sed in mauris. Sed mattis varius est in pellentesque. In hac habitasse platea dictumst. Sed et odio urna. Nullam viverra mi non magna porta, sit amet dignissim nisi consectetur. Ut condimentum, enim ut pulvinar venenatis, orci quam ullamcorper purus, in elementum felis urna in tortor.',
+37,
+100.50,
+1.80,
+TRUE,
+'2001-12-01',
+'12:30:08',
+'2025-05-12 09:28:50'
+);
+
+-- como fazer um update 
+
+UPDATE aluno
+	SET nome = 'TESTE', 
+cpf = '19876543210', 
+observacao = 'TESTE', 
+idade = 12, 
+dinheiro = 0.01, 
+altura = 1.60, 
+ativo = FALSE, 
+data_nascimento = '2015-05-20', 
+hora_aula = '10:30:00',
+matricula_em = '2020-07-01 17:20:00'
+WHERE id = 1;
+
+-- como fazer um delete 
+
+DELETE FROM aluno WHERE nome = 'TESTE';
+
+-- select com AS 
+
+SELECT nome AS "Nome Do Aluno",
+	idade, 
+	matricula_em AS quando_se_matriculou 
+FROM aluno;
+
+-- Inserts e Selects para testes, inserts com caracteres especiais 
+
+INSERT INTO aluno (nome) VALUES ('TESTE TESTE');
+INSERT INTO aluno (nome) VALUES ('TESTE TESTE2');
+INSERT INTO aluno (nome) VALUES ('TESTE TESTE3');
+INSERT INTO aluno (nome) VALUES ('TESTE6');
+
+SELECT * FROM aluno WHERE nome != 'TESTE2';
+SELECT * FROM aluno WHERE nome LIKE '%2';
+SELECT * FROM aluno WHERE idade BETWEEN 1 AND 50;
+
+SELECT * FROM aluno WHERE nome LIKE 'T%' AND cpf IS NOT null;
+
+-- Drop para create com primary key 
+
+DROP TABLE cursos;
+
+CREATE TABLE cursos (
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(255) NOT NULL
+);
+
+INSERT INTO cursos (nome) VALUES ('html');
+INSERT INTO cursos (nome) VALUES ('java');
+
+DELETE FROM cursos WHERE id = 1;
+
+INSERT INTO cursos (id, nome) VALUES (1, 'css');
+
+-- Ordenar um select
+
+SELECT * FROM cursos ORDER BY id ASC;
+SELECT * FROM aluno;
+
+DROP TABLE aluno;
+
+CREATE TABLE aluno (
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(255) NOT NULL
+);
+
+INSERT INTO aluno (nome) VALUES ('Teste');
+INSERT INTO aluno (nome) VALUES ('Teste2');
+
+SELECT * FROM aluno;
+
+DROP TABLE aluno_curso;
+
+-- Table com foreign key 
+
+CREATE TABLE aluno_curso (
+	aluno_id INTEGER,
+	curso_id INTEGER,
+	PRIMARY KEY (aluno_id, curso_id),
+
+	FOREIGN KEY (aluno_id) REFERENCES aluno (id),
+	FOREIGN KEY (curso_id) REFERENCES cursos (id)
+);
+
+INSERT INTO aluno_curso (aluno_id, curso_id) VALUES (1,1);
+INSERT INTO aluno_curso (aluno_id, curso_id) VALUES (2,1);
+
+SELECT * FROM aluno WHERE id = 1;
+SELECT * FROM cursos WHERE id = 1;
+SELECT * FROM aluno_curso;
+
+-- Tipos convencionais de JOIN
+
+SELECT aluno.nome AS aluno, cursos.nome AS curso FROM aluno 
+	JOIN aluno_curso ON aluno_curso.aluno_id = aluno.id
+	JOIN cursos ON aluno_curso.curso_id = cursos.id;
+	
+
+INSERT INTO aluno_curso (aluno_id, curso_id) VALUES (2,2);
+
+INSERT INTO aluno(nome) VALUES ('Teste3');
+INSERT INTO cursos(nome) VALUES ('javascript');
+
+SELECT aluno.nome AS aluno, 
+	   cursos.nome AS curso FROM aluno 
+	RIGHT JOIN aluno_curso ON aluno_curso.aluno_id = aluno.id
+	RIGHT JOIN cursos ON cursos.id = aluno_curso.curso_id;
+
+SELECT aluno.nome AS aluno, 
+   cursos.nome AS curso FROM aluno 
+	FULL JOIN aluno_curso ON aluno_curso.aluno_id = aluno.id
+	FULL JOIN cursos ON cursos.id = aluno_curso.curso_id;
+
+SELECT aluno.nome AS aluno, 
+       cursos.nome AS curso FROM aluno 
+CROSS JOIN cursos;
+
+-- Tipos de Delete
+
+DROP TABLE aluno_curso;
+
+CREATE TABLE aluno_curso (
+	aluno_id INTEGER,
+	curso_id INTEGER,
+	PRIMARY KEY (aluno_id, curso_id),
+
+	FOREIGN KEY (aluno_id) REFERENCES aluno (id) ON DELETE CASCADE,
+	FOREIGN KEY (curso_id) REFERENCES cursos (id) ON DELETE CASCADE
+);
+
+SELECT * FROM aluno_curso;
+DELETE FROM aluno_curso WHERE aluno_id = 2;
+
+-- UPDATE CASCADE
+
+SELECT * FROM aluno;
+
+DROP TABLE aluno_curso;
+CREATE TABLE aluno_curso (
+	aluno_id INTEGER,
+	curso_id INTEGER,
+	PRIMARY KEY (aluno_id, curso_id),
+
+	FOREIGN KEY (aluno_id) REFERENCES aluno (id) 
+	ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (curso_id) REFERENCES cursos (id) 
+	ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+UPDATE aluno SET id = 10 WHERE id = 1;
+SELECT * FROM aluno_curso;
+
+
+
+-- Ordem de Select
+
+DROP TABLE funcionarios;
+
+CREATE TABLE funcionarios (
+	id SERIAL PRIMARY KEY,
+	matricula VARCHAR(10),
+	nome VARCHAR(255),
+	sobrenome VARCHAR(255)
+);
+
+INSERT INTO funcionarios (matricula, nome, sobrenome) VALUES('M001', 'Teste1', 'Test18');
+INSERT INTO funcionarios (matricula, nome, sobrenome) VALUES('M002', 'Teste6', 'Test11');
+INSERT INTO funcionarios (matricula, nome, sobrenome) VALUES('M003', 'Teste5', 'Test14');
+INSERT INTO funcionarios (matricula, nome, sobrenome) VALUES('M004', 'Teste2', 'Test10');
+INSERT INTO funcionarios (matricula, nome, sobrenome) VALUES('M005', 'Teste3', 'Test13');
+INSERT INTO funcionarios (matricula, nome, sobrenome) VALUES('M006', 'Teste4', 'Test19');
+
+SELECT * 
+	FROM funcionarios
+	ORDER BY 4;
+
+-- Limitando Select
+
+SELECT * FROM funcionarios 
+ORDER BY id 
+LIMIT 5 
+OFFSET 1;
+
+-- Funçoes de agregaçao
+
+SELECT COUNT(id),
+	SUM(id),
+	MAX(id),
+	MIN(id),
+	ROUND(AVG(id),2) 
+	FROM funcionarios;
+
+-- Agrupamento de consultas
+
+SELECT nome, sobrenome, COUNT(id)
+	FROM funcionarios
+	GROUP BY nome, sobrenome
+	ORDER BY nome;
+
+-- Filtragem de consultas
+
+SELECT cursos.nome,
+	COUNT(aluno.id)
+	FROM cursos 
+LEFT JOIN aluno_curso ON aluno_curso.curso_id = cursos.id
+LEFT JOIN aluno ON aluno.id = aluno_curso.aluno_id
+	--WHERE curso.nome = 'css'
+GROUP BY 1
+HAVING COUNT(aluno.id) = 0;
+
+SELECT nome, COUNT (id)
+	FROM funcionarios
+	GROUP BY nome
+	HAVING COUNT(id) > 1;
